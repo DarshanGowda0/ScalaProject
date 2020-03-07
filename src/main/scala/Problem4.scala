@@ -11,16 +11,19 @@ case class RandomNum(lb: Int = 0, ub: Int = 100) extends Print
 
 object Problem4Main {
 
-
   val print: Parser[RandomNum] =
     subparser(
       command(
         "random_number",
         info(
           ^(
-            intOption(long("min"), help("Int (between min and max)")),
-            intOption(long("max"), help("Int (between min and max)")))
-          (RandomNum)
+            intOption(long("min"), help("Int (between min and max)"), metavar("Int (between min and max)")),
+            intOption(long("max"), help("Int (between min and max)"), metavar("Int (between min and max)"))
+          )
+          (RandomNum),
+          progDesc(
+            "|- --max Int (between min and max)\n|- --min Int (between " +
+              "min and max)")
         )
       )
     )
@@ -34,8 +37,8 @@ object Problem4Main {
 
   def main(args: Array[String]): Unit = {
     val opts = info(print <*> helper,
-      progDesc("print a random number between lb and ub"),
-      header("hello - a test for scala-optparse-applicative"))
+      progDesc("print a random number between [min] and [max]"),
+      header("A simple random-number generator!"))
     eval(execParser(args, "print", opts))
   }
 
