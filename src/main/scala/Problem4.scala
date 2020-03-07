@@ -1,18 +1,42 @@
-sealed trait Cmd
-sealed trait Print extends Cmd
-case class RandomNum(lb: Int = 0, ub: Int = 100) extends Print
-sealed trait Run extends Cmd
-case class Q1(expr: String) extends Run {
-  def parse: Calc = ???
-}
-case class Q2(greedy: Boolean, k: Int) extends Run
-sealed trait Q3 extends Run
-case class Q3Put(key: String, value: String) extends Q3
-case class Q3Get(key: String) extends Q3
-case object Q3Dump extends Q3
-case object Q3Start extends Q3
-case object Q3Stop extends Q3
+import optparse_applicative._
+import scalaz.syntax.apply._
 
-class Problem4 {
+sealed trait Cmd
+
+sealed trait Print extends Cmd
+
+case class PrintOptions(randomNum: RandomNum)
+
+case class RandomNum(lb: Int = 0, ub: Int = 100) extends Print
+
+object Problem4Main {
+
+
+  val print: Parser[RandomNum] =
+    subparser(
+      command(
+        "random_number",
+        info(
+          ^(
+            intOption(long("min"), help("Int (between min and max)")),
+            intOption(long("max"), help("Int (between min and max)")))
+          (RandomNum)
+        )
+      )
+    )
+
+
+  def eval(randomNum: RandomNum): Unit = randomNum match {
+    case RandomNum(lb, ub) => val rnd = new scala.util.Random
+      println(lb + rnd.nextInt((ub - lb) + 1))
+    case _ =>
+  }
+
+  def main(args: Array[String]): Unit = {
+    val opts = info(print <*> helper,
+      progDesc("print a random number between lb and ub"),
+      header("hello - a test for scala-optparse-applicative"))
+    eval(execParser(args, "print", opts))
+  }
 
 }
